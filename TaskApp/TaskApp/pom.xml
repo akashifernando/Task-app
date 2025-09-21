@@ -160,7 +160,8 @@
 				<version>3.2.5</version>
 				<configuration>
 					<excludes>
-						<exclude>**/*UiTest.java</exclude>
+						<exclude>**/apiTest/ApiTests.java</exclude>
+						<exclude>**/ui/LoginUiTest.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
