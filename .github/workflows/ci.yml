@@ -18,7 +18,7 @@ jobs:
         image: mysql:8
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: root
+          MYSQL_DATABASE: taskappdb
         ports:
           - 3306:3306
         options: >-
