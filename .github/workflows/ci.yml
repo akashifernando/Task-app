@@ -43,6 +43,8 @@ jobs:
           for i in {1..30}; do
             if mysqladmin ping -h localhost -u root -proot --silent; then
               echo "MySQL is ready!"
+              # Create database if it doesn't exist
+              mysql -h localhost -u root -proot -e "CREATE DATABASE IF NOT EXISTS taskappdb;"
               break
             else
               echo "Waiting for MySQL... ($i/30)"
@@ -53,18 +55,18 @@ jobs:
       - name: Build application
         run: mvn clean compile -DskipTests
 
-      - name: Run unit tests (excluding integration and UI tests)
+      - name: Run tests with MySQL
         run: |
-          mvn test -Dtest=!*IntegrationTest,*UiTest,*ApiTest -DfailIfNoTests=false
-
-      - name: Run integration tests with database
-        run: |
-          mvn test -Dtest=*ApiTest -Dspring.datasource.url=jdbc:mysql://localhost:3306/taskappdb -Dspring.datasource.username=root -Dspring.datasource.password=root
+          mvn test -Dspring.datasource.url=jdbc:mysql://localhost:3306/taskappdb -Dspring.datasource.username=root -Dspring.datasource.password=root -Dspring.jpa.hibernate.ddl-auto=create-drop
         env:
           SPRING_PROFILES_ACTIVE: test
 
-      - name: Skip UI tests (fix ChromeDriver issue)
-        run: echo "Skipping UI tests in CI environment due to ChromeDriver limitations"
-
       - name: Verify build
         run: mvn package -DskipTests
+
+      - name: Upload test reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: TaskApp/TaskApp/target/surefire-reports/
