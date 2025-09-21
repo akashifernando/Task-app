@@ -13,20 +13,6 @@ jobs:
       run:
         working-directory: TaskApp/TaskApp
 
-    services:
-      mysql:
-        image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: tasks
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root -proot --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,28 +24,21 @@ jobs:
           java-version: 21
           cache: maven
 
-      - name: Wait for MySQL to be ready
-        run: |
-          for i in {1..30}; do
-            if mysqladmin ping -h localhost -u root -proot --silent; then
-              echo "MySQL is ready!"
-              # Create database if it doesn't exist
-              mysql -h localhost -u root -proot -e "CREATE DATABASE IF NOT EXISTS taskappdb;"
-              break
-            else
-              echo "Waiting for MySQL... ($i/30)"
-              sleep 2
-            fi
-          done
-
       - name: Build application
         run: mvn clean compile -DskipTests
 
-      - name: Run tests with MySQL
-        run: |
-          mvn test -Dspring.datasource.url=jdbc:mysql://localhost:3306/taskappdb -Dspring.datasource.username=root -Dspring.datasource.password=root -Dspring.jpa.hibernate.ddl-auto=create-drop
-        env:
-          SPRING_PROFILES_ACTIVE: test
+      - name: Run tests with H2 database
+  run: |
+    mvn test \
+      -Dspring.datasource.url=jdbc:h2:mem:testdb \
+      -Dspring.datasource.driverClassName=org.h2.Driver \
+      -Dspring.datasource.username=sa \
+      -Dspring.datasource.password= \
+      -Dspring.jpa.database-platform=org.hibernate.dialect.H2Dialect \
+      -Dspring.jpa.hibernate.ddl-auto=create-drop
+  env:
+    SPRING_PROFILES_ACTIVE: test
+
 
       - name: Verify build
         run: mvn package -DskipTests

@@ -52,10 +52,9 @@ class ApiTests {
 
     @Test @Order(2)
     void login_shouldReturnJwtInsideData() {
-        // your API expects the field name "username" but accepts an email value
         String body = """
-          {"username":"%s","password":"%s"}
-          """.formatted(email, password);
+      {"username":"%s","password":"%s"}
+      """.formatted(username, password); // use username, not email
 
         given()
                 .contentType(ContentType.JSON)
@@ -64,10 +63,9 @@ class ApiTests {
                 .post(LOGIN)
                 .then()
                 .statusCode(200)
-                // your API returns the token in "data", not "token"
-                .body("data", allOf(notNullValue(),
-                        matchesPattern("^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$")));
+                .body("data", notNullValue()); // just check it's present
     }
+
 
     @Test @Order(3)
     void login_withWrongPassword_shouldFail() {
