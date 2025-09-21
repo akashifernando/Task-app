@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    # point to where your pom.xml is located
     defaults:
       run:
         working-directory: TaskApp/TaskApp
@@ -24,28 +26,41 @@ jobs:
           java-version: 21
           cache: maven
 
-      - name: Build application
-        run: mvn clean compile -DskipTests
+      - name: Show Java & Maven versions
+        run: |
+          java -version
+          mvn -v
 
+      - name: Verify pom location
+        run: |
+          pwd
+          ls -la
+
+      # ✅ updated test step (H2 database, no MySQL)
       - name: Run tests with H2 database
-  run: |
-    mvn test \
-      -Dspring.datasource.url=jdbc:h2:mem:testdb \
-      -Dspring.datasource.driverClassName=org.h2.Driver \
-      -Dspring.datasource.username=sa \
-      -Dspring.datasource.password= \
-      -Dspring.jpa.database-platform=org.hibernate.dialect.H2Dialect \
-      -Dspring.jpa.hibernate.ddl-auto=create-drop
-  env:
-    SPRING_PROFILES_ACTIVE: test
+        run: |
+          mvn test \
+            -Dspring.datasource.url=jdbc:h2:mem:testdb \
+            -Dspring.datasource.driverClassName=org.h2.Driver \
+            -Dspring.datasource.username=sa \
+            -Dspring.datasource.password= \
+            -Dspring.jpa.database-platform=org.hibernate.dialect.H2Dialect \
+            -Dspring.jpa.hibernate.ddl-auto=create-drop
+        env:
+          SPRING_PROFILES_ACTIVE: test
 
+      - name: Package application
+        run: mvn -B -DskipTests package
 
-      - name: Verify build
-        run: mvn package -DskipTests
+      - name: Upload packaged JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: taskapp-jar
+          path: TaskApp/TaskApp/target/*.jar
 
       - name: Upload test reports on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
+          name: surefire-reports
           path: TaskApp/TaskApp/target/surefire-reports/
