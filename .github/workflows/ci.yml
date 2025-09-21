@@ -36,20 +36,19 @@ jobs:
           pwd
           ls -la
 
-      # ✅ updated test step (H2 database, no MySQL)
-- name: Run tests with H2 database
-  run: |
-    mvn test \
-      -Dtest=\!com.project.TaskApp.apiTest.ApiTests \
-      -Dspring.datasource.url=jdbc:h2:mem:testdb \
-      -Dspring.datasource.driverClassName=org.h2.Driver \
-      -Dspring.datasource.username=sa \
-      -Dspring.datasource.password= \
-      -Dspring.jpa.database-platform=org.hibernate.dialect.H2Dialect \
-      -Dspring.jpa.hibernate.ddl-auto=create-drop
-  env:
-    SPRING_PROFILES_ACTIVE: test
-
+      # ✅ updated test step (H2 database, skip ApiTests)
+      - name: Run tests with H2 database
+        run: |
+          mvn test \
+            -Dtest=\!com.project.TaskApp.apiTest.ApiTests \
+            -Dspring.datasource.url=jdbc:h2:mem:testdb \
+            -Dspring.datasource.driverClassName=org.h2.Driver \
+            -Dspring.datasource.username=sa \
+            -Dspring.datasource.password= \
+            -Dspring.jpa.database-platform=org.hibernate.dialect.H2Dialect \
+            -Dspring.jpa.hibernate.ddl-auto=create-drop
+        env:
+          SPRING_PROFILES_ACTIVE: test
 
       - name: Package application
         run: mvn -B -DskipTests package
