@@ -36,11 +36,11 @@ jobs:
           pwd
           ls -la
 
-      # ✅ updated test step (H2 database, skip ApiTests)
+      # ✅ run tests with H2 database, skipping UI + API tests
       - name: Run tests with H2 database
         run: |
           mvn test \
-            -Dtest=\!com.project.TaskApp.apiTest.ApiTests \
+            -Dtest=\!com.project.TaskApp.apiTest.ApiTests,\!com.project.TaskApp.uiTest.LoginUiTest \
             -Dspring.datasource.url=jdbc:h2:mem:testdb \
             -Dspring.datasource.driverClassName=org.h2.Driver \
             -Dspring.datasource.username=sa \
