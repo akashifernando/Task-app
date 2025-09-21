@@ -171,6 +171,7 @@
 						<exclude>**/*IT.java</exclude>
 						<exclude>**/*ITCase.java</exclude>
 					</excludes>
+					<failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
 				</configuration>
 			</plugin>
 
