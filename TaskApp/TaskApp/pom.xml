@@ -158,19 +158,16 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.2.5</version>
-
-				<!-- Run ONLY unit tests that end with *UnitTest.java -->
 				<configuration>
 					<includes>
-						<include>**/*UnitTest.java</include>
+						<include>**/service/*.java</include> <!-- Include all tests in service package -->
+						<include>**/bdd/*.java</include> <!-- Include all tests in bdd package -->
 					</includes>
-
-					<!-- Belt-and-suspenders: exclude UI & API test folders and names -->
 					<excludes>
-						<exclude>**/ui/**</exclude>
-						<exclude>**/apiTest/**</exclude>
+						<exclude>**/ui/**</exclude> <!-- Exclude UI tests package -->
+						<exclude>**/apiTest/**</exclude> <!-- Exclude API tests package -->
 						<exclude>**/*UiTest.java</exclude>
-						<exclude>**/ApiTests.java</exclude>
+						<exclude>**/*ApiTests.java</exclude>
 						<exclude>**/*IT.java</exclude>
 						<exclude>**/*ITCase.java</exclude>
 					</excludes>
